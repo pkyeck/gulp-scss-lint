@@ -65,11 +65,11 @@ module.exports = function (options, throwError) {
             var result = formatLine(line);
 
             gutil.log(colors.cyan(currentFile.path) + ':' + colors.magenta(result.line) + ' [' + result.errorType + '] ' + result.msg);
-          });
 
-          if (throwError) {
-            throw new gutil.PluginError(PLUGIN_NAME, result.errorType, "xxx");
-          }
+            if (throwError) {
+              throw new gutil.PluginError(PLUGIN_NAME, result.errorType, "xxx");
+            }
+          });
         }
 
         currentFile.scsslint  = {'success': report.length === 0};
