@@ -42,10 +42,11 @@ module.exports = function (options, throwError) {
   return es.map(function(file, cb) {
     var args = ['scss-lint', file.path.replace(/(\s)/g, "\\ ")].concat(optionsArgs);
     var command = args.join(' ');
-    var notificationOutput = "";
 
     (function () {
       var currentFile = file;
+
+      currentFile.scsslint = {results: []};
 
       exec(command, function (error, report) {
         if (error && error.code !== 65) {
@@ -64,15 +65,12 @@ module.exports = function (options, throwError) {
           report.forEach(function (line) {
             var result = formatLine(line);
 
+            currentFile.scsslint.results.push(result);
             gutil.log(colors.cyan(currentFile.path) + ':' + colors.magenta(result.line) + ' [' + result.errorType + '] ' + result.msg);
-
-            if (throwError) {
-              throw new gutil.PluginError(PLUGIN_NAME, result.errorType, "xxx");
-            }
           });
         }
 
-        currentFile.scsslint  = {'success': report.length === 0};
+        currentFile.scsslint.success = report.length === 0;
 
         cb(null, currentFile);
       });
