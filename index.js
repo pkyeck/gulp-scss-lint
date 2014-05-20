@@ -29,7 +29,7 @@ var scssLintCodes = {
   '127': 'You need to have Ruby and scss-lint gem installed'
 };
 
-module.exports = function (options) {
+module.exports = function (options, callback) {
   options = options || {};
 
   var optionsArgs = dargs(options);
@@ -41,6 +41,7 @@ module.exports = function (options) {
   return es.map(function(file, cb) {
     var args = ['scss-lint', file.path.replace(/(\s)/g, "\\ ")].concat(optionsArgs);
     var command = args.join(' ');
+    var notificationOutput = "";
 
     (function () {
       var currentFile = file;
@@ -63,7 +64,12 @@ module.exports = function (options) {
             var result = formatLine(line);
 
             gutil.log(colors.cyan(currentFile.path) + ':' + colors.magenta(result.line) + ' [' + result.errorType + '] ' + result.msg);
+            notificationOutput += currentFile.path + ':' + result.line + ' => ' + result.msg;
           });
+
+          if (callback) {
+            callback(notificationOutput);
+          }
         }
 
         currentFile.scsslint  = {'success': report.length === 0};
